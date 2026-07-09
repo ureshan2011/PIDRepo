@@ -465,7 +465,7 @@ Graph view (toggled):
 - **Empty state**: "No new insights — check back after your next sync, or lower the sensitivity in
   Settings."
 
-### Weekly/Monthly Review
+### Weekly/Monthly Reviews
 
 ```text
 +------------------------------------------------------------------------------+
@@ -536,7 +536,7 @@ flowchart TD
     Shell --> Journal["AI Journal"]
     Shell --> Search["Smart Search"]
     Shell --> Insights["AI Insights"]
-    Shell --> Reviews["Weekly/Monthly Review"]
+    Shell --> Reviews["Weekly/Monthly Reviews"]
     Shell --> Assistant["AI Assistant"]
     Shell --> Settings["Settings"]
 
@@ -584,7 +584,7 @@ flowchart TD
 | AI Journal | No entry for selected date | Prompt + blank editor, not an error |
 | Smart Search | No query yet / zero results | Recent + suggested queries; zero-result tip to check Connections |
 | AI Insights | No `insights` with `status='new'` | "Check back after your next sync" |
-| Weekly/Monthly Review | Period not yet generated | Skeleton "generating…" or `[ Generate now ]` |
+| Weekly/Monthly Reviews | Period not yet generated | Skeleton "generating…" or `[ Generate now ]` |
 | AI Assistant | Fresh conversation | Suggested starter prompts from today's briefing |
 | Settings → Connections | No connectors configured yet | "Add your first account" CTA (setup wizard) |
 

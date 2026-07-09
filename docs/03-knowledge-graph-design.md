@@ -1,9 +1,9 @@
 # 03 — Knowledge Graph Design
 
 Related: [README](../README.md) · [System architecture](01-system-architecture.md) ·
-[Database schema](02-database-schema.md) · [AI pipeline](07-ai-pipeline.md) (planned) ·
-[Dashboard components](09-dashboard-components.md) (planned) ·
-[Scalability](11-scalability.md) (planned)
+[Database schema](02-database-schema.md) · [AI pipeline](07-ai-pipeline.md) ·
+[Dashboard components](09-dashboard-components.md) ·
+[Scalability](11-scalability.md)
 
 ## Overview
 
@@ -84,7 +84,7 @@ new types don't require a migration. The recommended baseline set:
 | `Goal` | A user-defined objective (mirrors an app-table `goals` row). | `target_date` | Goal Tracking section |
 
 Adding a type is a product decision (does it need its own `EntityCard` treatment?), not a schema
-change — see [09-dashboard-components.md](09-dashboard-components.md) (planned).
+change — see [09-dashboard-components.md](09-dashboard-components.md).
 
 ## Edge / relation type taxonomy
 
@@ -185,7 +185,7 @@ For free-text bodies (email body, notes, documents, journal entries, AI conversa
 structured-output prompt against the locally running LM Studio instance extracts entities and
 relations the deterministic pass can't see — a person named in prose but not in the `To:` line, a
 topic, a `relates_to` link between two projects mentioned in the same paragraph. Full prompt
-templates live in [07-ai-pipeline.md](07-ai-pipeline.md) (planned); the graph-relevant contract is:
+templates live in [07-ai-pipeline.md](07-ai-pipeline.md); the graph-relevant contract is:
 
 ```text
 INPUT:  item.title, item.body (chunked if it exceeds the context budget), a short list of
@@ -211,7 +211,7 @@ for extraction in llm_extract(item):
 Because this pass is probabilistic, `confidence` is the model's own self-reported score
 (instructed as part of the schema), never defaulted to `1.0`, and low-confidence edges are filtered
 out of RAG citations and the default graph view below a configurable threshold (default `0.5`,
-stored in `settings`). See [06-security-privacy-model.md](06-security-privacy-model.md) (planned)
+stored in `settings`). See [06-security-privacy-model.md](06-security-privacy-model.md)
 for prompt-injection mitigations relevant to extracting structured data from untrusted ingested
 content.
 
@@ -285,7 +285,7 @@ for (a, b) in candidate_pairs(block):
 
 Pairs scoring between the review threshold and the merge threshold are **not** auto-merged; they're
 queued for a one-click confirm/reject in the `EntityCard` UI
-([09-dashboard-components.md](09-dashboard-components.md), planned), which is also where a bad
+([09-dashboard-components.md](09-dashboard-components.md)), which is also where a bad
 auto-merge can be manually undone (clear `canonical_entity_id`).
 
 ## Graph query patterns in the app layer
@@ -344,8 +344,8 @@ without duplicating it.
 ## Visualization approach (Cytoscape.js)
 
 The Knowledge Hub's graph view and any "explore from here" affordance on an `EntityCard`
-([09-dashboard-components.md](09-dashboard-components.md), planned) render through **Cytoscape.js**
-(chosen and justified in [04-technology-stack.md](04-technology-stack.md), planned).
+([09-dashboard-components.md](09-dashboard-components.md)) render through **Cytoscape.js**
+(chosen and justified in [04-technology-stack.md](04-technology-stack.md)).
 
 **Data adapter.** The Knowledge Graph Service's neighbor/traversal responses are mapped straight to
 Cytoscape elements:
@@ -388,14 +388,14 @@ entity's grounding items (a list, not graph nodes, to avoid item-count blowup).
 
 SQLite's `entities`/`edges` design, including the recursive-CTE traversal above, is expected to
 comfortably serve a single user's graph for years — see
-[11-scalability.md](11-scalability.md) (planned) for the full data-volume analysis. Watch for these
+[11-scalability.md](11-scalability.md) for the full data-volume analysis. Watch for these
 concrete trigger conditions rather than migrating preemptively:
 
 | Trigger | Symptom | Response |
 |---|---|---|
 | Edge count in the low millions | Recursive-CTE traversals beyond 2–3 hops noticeably slow the AI Assistant / Decision Support graph queries | First: tighten indexes/depth caps, cache common traversals; only then consider migration |
 | Need for graph algorithms SQL can't express well | PageRank-style "most central entity," community detection, weighted shortest path at scale | These are the strongest signal — SQL recursive CTEs can approximate but not efficiently compute them |
-| High-frequency concurrent graph writes | Multiple extraction jobs contending on the same SQLite writer becomes a bottleneck (see WAL limits in [11](11-scalability.md), planned) | Batch/queue writes first; migration is a last resort given PID's single-writer worker design |
+| High-frequency concurrent graph writes | Multiple extraction jobs contending on the same SQLite writer becomes a bottleneck (see WAL limits in [11](11-scalability.md)) | Batch/queue writes first; migration is a last resort given PID's single-writer worker design |
 
 **Candidates, in order of fit with the local-first constraint:**
 
@@ -418,9 +418,9 @@ of a single user's only copy of their data.
   sketches, foreign-key/index summary, and the full core-table ER diagram.
 - [01-system-architecture.md](01-system-architecture.md) — Knowledge Graph Service's place in the
   module boundaries and its role in the data-flow diagram.
-- [07-ai-pipeline.md](07-ai-pipeline.md) (planned) — LLM extraction prompt templates in full, and
+- [07-ai-pipeline.md](07-ai-pipeline.md) — LLM extraction prompt templates in full, and
   how RAG citations consume the item-grounding query pattern above.
-- [09-dashboard-components.md](09-dashboard-components.md) (planned) — `EntityCard` and
+- [09-dashboard-components.md](09-dashboard-components.md) — `EntityCard` and
   `KnowledgeGraphView` component contracts that consume this design.
-- [11-scalability.md](11-scalability.md) (planned) — data-volume projections behind the graph-DB
+- [11-scalability.md](11-scalability.md) — data-volume projections behind the graph-DB
   migration triggers above.

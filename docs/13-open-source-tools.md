@@ -1,9 +1,8 @@
 # 13 — Open-Source Tools
 
 Related: [README](../README.md) · [System architecture](01-system-architecture.md) ·
-[Technology stack](04-technology-stack.md) · [AI pipeline](07-ai-pipeline.md) (planned) ·
-[API integrations](05-api-integrations.md) (planned) · [Outlook collector](15-outlook-collector.md)
-(planned)
+[Technology stack](04-technology-stack.md) · [AI pipeline](07-ai-pipeline.md) ·
+[API integrations](05-api-integrations.md) · [Outlook collector](15-outlook-collector.md)
 
 ## Overview
 
@@ -37,7 +36,7 @@ depends on or references them.
 | Tool | License | Role in PID | Maturity |
 |---|---|---|---|
 | **sqlite-vec** | MIT / Apache-2.0 (dual) | Chosen vector index — `vec0` virtual tables inside the same SQLite file (`embeddings`, `entity_embeddings` — [02-database-schema.md](02-database-schema.md)). | Younger project (successor to `sqlite-vss`) but under active development by the same author who maintains widely-used SQLite tooling; the single-file, no-server property is the deciding factor over raw maturity. |
-| **usearch** | Apache-2.0 | Not used; a faster/alternative embedded ANN library considered if `sqlite-vec` KNN performance becomes a bottleneck at scale (see [11-scalability.md](11-scalability.md), planned). | Mature, benchmark-focused, multi-language bindings. |
+| **usearch** | Apache-2.0 | Not used; a faster/alternative embedded ANN library considered if `sqlite-vec` KNN performance becomes a bottleneck at scale (see [11-scalability.md](11-scalability.md)). | Mature, benchmark-focused, multi-language bindings. |
 | **hnswlib-node** | Apache-2.0 | Not used; classic HNSW ANN option, evaluated and passed over because it requires managing a separate on-disk index file outside SQLite. | Mature C++ core with a stable Node binding. |
 | **`@xenova/transformers`** (Transformers.js) | Apache-2.0 | Not used for inference (all embedding/chat calls go through LM Studio per the README's local-AI decision); noted here as the option if PID ever needs an in-process JS fallback embedder with no external server at all. | Actively maintained, runs ONNX models fully in-process (WASM/WebGPU). |
 
@@ -65,12 +64,12 @@ depends on or references them.
 | **rss-parser** | MIT | Chosen parser for the RSS/news connector (`feeds`/`feed_items` — [02-database-schema.md](02-database-schema.md)). | Mature, simple, handles RSS 2.0/Atom/JSON Feed. |
 | **node-ical** | MIT | Chosen iCalendar (`.ics`) parser — CalDAV-sourced calendars and any `.ics` import path. | Actively maintained, handles RRULE expansion needed for `events.recurrence_rule`. |
 | **ical.js** | MPL-2.0 | Alternative iCalendar parser considered; Mozilla-maintained (used in Thunderbird), more spec-complete but heavier API surface. | Mature, MPL-2.0 is a weak-copyleft file-level license — compatible with local-only distribution. |
-| **imapflow** | MIT | Chosen IMAP client for the email connector's IMAP tap ([15-outlook-collector.md](15-outlook-collector.md), planned) — modern async/await API. | Actively maintained by the Nodemailer author; verify license terms at implementation time, as sibling projects from the same author use dual-licensing for some use cases. |
+| **imapflow** | MIT | Chosen IMAP client for the email connector's IMAP tap ([15-outlook-collector.md](15-outlook-collector.md)) — modern async/await API. | Actively maintained by the Nodemailer author; verify license terms at implementation time, as sibling projects from the same author use dual-licensing for some use cases. |
 | **mailparser** | MIT | Chosen MIME parser — turns raw IMAP-fetched RFC 5322 messages into the structured shape `emails` needs (`from_address`, `to_addresses`, attachments). | Mature, same maintainer/ecosystem as imapflow, well-tested against real-world mail. |
-| **@microsoft/microsoft-graph-client** | MIT | Chosen SDK for the Microsoft Graph tap (Outlook mail/calendar, OneDrive) — the primary tap per [15-outlook-collector.md](15-outlook-collector.md) (planned). | Microsoft-maintained, actively developed alongside the Graph API itself. |
+| **@microsoft/microsoft-graph-client** | MIT | Chosen SDK for the Microsoft Graph tap (Outlook mail/calendar, OneDrive) — the primary tap per [15-outlook-collector.md](15-outlook-collector.md). | Microsoft-maintained, actively developed alongside the Graph API itself. |
 | **googleapis** | Apache-2.0 | Chosen SDK for the Google connector (Gmail, Calendar, Drive). | Google-maintained, comprehensive, standard choice. |
 | **openid-client** | MIT | Chosen OAuth2/OIDC client for connector auth flows (Microsoft Graph, Google, Slack). | Mature, spec-conformant, widely used in Node auth stacks. |
-| **Redemption** | **Proprietary / commercial** (per-developer license; not OSS) | Referenced, not bundled: the COM automation library the companion collector's classic-Outlook-desktop tap uses to read MAPI items without triggering Outlook's security prompts, when neither Graph nor IMAP is available for an account ([01-system-architecture.md](01-system-architecture.md#the-companion-collector), [15-outlook-collector.md](15-outlook-collector.md), planned). | Long-standing, de facto standard for this exact problem in the Windows/Outlook-automation community; called out explicitly because it is the one required non-OSS dependency in the whole stack, and only loaded on the desktop-collector's COM-tap code path. |
+| **Redemption** | **Proprietary / commercial** (per-developer license; not OSS) | Referenced, not bundled: the COM automation library the companion collector's classic-Outlook-desktop tap uses to read MAPI items without triggering Outlook's security prompts, when neither Graph nor IMAP is available for an account ([01-system-architecture.md](01-system-architecture.md#the-companion-collector), [15-outlook-collector.md](15-outlook-collector.md)). | Long-standing, de facto standard for this exact problem in the Windows/Outlook-automation community; called out explicitly because it is the one required non-OSS dependency in the whole stack, and only loaded on the desktop-collector's COM-tap code path. |
 | **node-imap** | MIT | Not the default; classic callback-based IMAP client kept as a fallback if imapflow's newer API proves unsuitable for a specific server's quirks. | Very mature, effectively feature-frozen. |
 
 ## NLP helpers
@@ -89,7 +88,7 @@ depends on or references them.
 |---|---|---|---|
 | **Vitest** | MIT | Chosen unit/service-layer test runner — fast, native ESM/TS support, shares config idiom with the Vite ecosystem Next.js tooling increasingly assumes. | Actively maintained, now the default choice across most modern TS/React stacks. |
 | **Playwright** | Apache-2.0 | Chosen end-to-end test runner — drives the packaged Electron shell and the plain browser mode identically. | Microsoft-maintained, mature, strong multi-browser and Electron support. |
-| **@testing-library/react** | MIT | Chosen for component-level tests of shared dashboard components ([09-dashboard-components.md](09-dashboard-components.md), planned). | Mature, the de facto standard for behavior-driven React component testing. |
+| **@testing-library/react** | MIT | Chosen for component-level tests of shared dashboard components ([09-dashboard-components.md](09-dashboard-components.md)). | Mature, the de facto standard for behavior-driven React component testing. |
 | **msw** (Mock Service Worker) | MIT | Chosen for mocking LM Studio's OpenAI-compatible endpoint and connector-source APIs in tests, so tests don't require a running LM Studio instance. | Actively maintained, widely adopted for exactly this network-boundary-mocking use case. |
 
 ## Adjacent self-hosted apps worth borrowing ideas from
@@ -108,8 +107,7 @@ below says specifically what to look at, not just "it's similar."
 **A note on copyleft.** Logseq, Firefly III, and Immich are AGPL-3.0 — a strong copyleft license.
 None of their code is used in PID; they are cited as design references only. If any future
 implementation phase considers vendoring or adapting code (not just ideas) from an AGPL project,
-that decision needs explicit review against [06-security-privacy-model.md](06-security-privacy-model.md)
-(planned) and the project's own licensing goals before it happens.
+that decision needs explicit review against [06-security-privacy-model.md](06-security-privacy-model.md) and the project's own licensing goals before it happens.
 
 ## Cross-references
 
@@ -119,7 +117,7 @@ that decision needs explicit review against [06-security-privacy-model.md](06-se
   into (ingestion/connectors, pipeline, background worker, storage).
 - [03-knowledge-graph-design.md](03-knowledge-graph-design.md) — the graph model behind the
   Cytoscape.js entry above.
-- [07-ai-pipeline.md](07-ai-pipeline.md) (planned) — where the NLP-helper and tokenizer entries above
+- [07-ai-pipeline.md](07-ai-pipeline.md) — where the NLP-helper and tokenizer entries above
   are used in the chunk/embed/extract pipeline.
-- [15-outlook-collector.md](15-outlook-collector.md) (planned) — full detail on the IMAP/Graph/COM
+- [15-outlook-collector.md](15-outlook-collector.md) — full detail on the IMAP/Graph/COM
   taps that motivate the ingestion-section entries above, including Redemption.

@@ -44,7 +44,7 @@ pm2 save
 pm2's own `pm2 startup` auto-boot mechanism is Linux/macOS-oriented; on Windows it needs the
 `pm2-windows-startup` companion package (`pnpm add -g pm2-windows-startup && pm2-startup install`)
 to register itself for automatic start. pm2 is a reasonable cross-platform choice if the same
-person also runs PID's cloud/self-hosted mode ([below](#optional-cloud-self-hosted-deployment)) and
+person also runs PID's cloud/self-hosted mode ([below](#optional-cloudself-hosted-deployment)) and
 wants one familiar tool across both.
 
 #### NSSM (Non-Sucking Service Manager) + Task Scheduler

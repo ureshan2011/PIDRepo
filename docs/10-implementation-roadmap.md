@@ -100,7 +100,7 @@ locked in [04-technology-stack.md](04-technology-stack.md).
 
 - Next.js 15 (App Router) + TypeScript strict-mode project scaffold; ESLint + Prettier configured.
 - `better-sqlite3` + Drizzle ORM wired up; `PRAGMA journal_mode = WAL` and `PRAGMA foreign_keys = ON`
-  set at connection time (see [11-scalability.md](11-scalability.md#wal-tuning)).
+  set at connection time (see [11-scalability.md](11-scalability.md#1-wal-tuning-and-pragma-optimization)).
 - Drizzle Kit migrations for every table group in
   [02-database-schema.md](02-database-schema.md) — core, graph, domain, app — plus the two raw-SQL
   virtual-table migrations for `items_fts` (FTS5) and `embeddings`/`entity_embeddings` (sqlite-vec).

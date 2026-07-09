@@ -1,8 +1,8 @@
 # 02 — Database Schema
 
 Related: [README](../README.md) · [System architecture](01-system-architecture.md) ·
-[Knowledge graph design](03-knowledge-graph-design.md) · [API integrations](05-api-integrations.md)
-(planned) · [Outlook collector](15-outlook-collector.md) (planned)
+[Knowledge graph design](03-knowledge-graph-design.md) · [API integrations](05-api-integrations.md) ·
+[Outlook collector](15-outlook-collector.md)
 
 ## Overview
 
@@ -41,8 +41,8 @@ Migrations are plain Drizzle Kit SQL migration files checked into `db/migrations
 separate schema-description format — the `sqliteTable()` definitions below **are** the schema, and
 the two virtual tables (`embeddings`, `items_fts`) are created by raw-SQL migrations that Drizzle
 Kit ships alongside the generated ones (Drizzle's schema builder has no native virtual-table
-support). See [04-technology-stack.md](04-technology-stack.md) (planned) for tooling detail and
-[11-scalability.md](11-scalability.md) (planned) for `PRAGMA journal_mode = WAL` and file-size
+support). See [04-technology-stack.md](04-technology-stack.md) for tooling detail and
+[11-scalability.md](11-scalability.md) for `PRAGMA journal_mode = WAL` and file-size
 guidance.
 
 ---
@@ -54,7 +54,7 @@ guidance.
 registry of configured connector instances (one row per account/connector pair) that `items.source_id`
 points into. `item_external_ids` and `message_identity` exist because a single real-world thing
 (an email, an event) can be **ingested more than once, by more than one tap** — see
-[15-outlook-collector.md](15-outlook-collector.md) (planned) — and need to collapse to one `items`
+[15-outlook-collector.md](15-outlook-collector.md) — and need to collapse to one `items`
 row.
 
 ### SQL DDL
@@ -1101,8 +1101,8 @@ export const messageIdentity = sqliteTable("message_identity", {
 The per-account health enum on `sources.status` and `sync_state.status`
 (`ok | stale | auth_failed | needs_consent | tap_unavailable`) is the same enum surfaced by the
 Settings → Connections UI's `ConnectionHealthList` component
-([09-dashboard-components.md](09-dashboard-components.md), planned) and defined in full — including
-the state machine that drives it — in [15-outlook-collector.md](15-outlook-collector.md) (planned).
+([09-dashboard-components.md](09-dashboard-components.md)) and defined in full — including
+the state machine that drives it — in [15-outlook-collector.md](15-outlook-collector.md).
 Keep the string values identical across those docs.
 
 ---
@@ -1244,7 +1244,7 @@ flowchart LR
   `edges`: type taxonomy, the three linking mechanisms, resolution, query patterns, visualization.
 - [01-system-architecture.md](01-system-architecture.md) — where this schema sits in the layered
   architecture and which service owns each table group.
-- [05-api-integrations.md](05-api-integrations.md) (planned) and
-  [15-outlook-collector.md](15-outlook-collector.md) (planned) — the connector- and
+- [05-api-integrations.md](05-api-integrations.md) and
+  [15-outlook-collector.md](15-outlook-collector.md) — the connector- and
   collector-side use of `sync_state`, `item_external_ids`, and `message_identity` for incremental
   sync and cross-tap dedupe.

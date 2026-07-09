@@ -2,8 +2,8 @@
 
 Related: [README](../README.md) · [System architecture](01-system-architecture.md) ·
 [Database schema](02-database-schema.md) · [Knowledge graph design](03-knowledge-graph-design.md) ·
-[API integrations](05-api-integrations.md) (planned) · [AI pipeline](07-ai-pipeline.md) (planned) ·
-[Deployment](12-deployment.md) (planned) · [Open-source tools catalog](13-open-source-tools.md)
+[API integrations](05-api-integrations.md) · [AI pipeline](07-ai-pipeline.md) ·
+[Deployment](12-deployment.md) · [Open-source tools catalog](13-open-source-tools.md)
 
 ## Overview
 
@@ -51,8 +51,8 @@ flowchart TB
 | File parsing — PDF | **pdf-parse** (wraps `pdfjs-dist`) | Pure JS/Node, no native binary to compile; text extraction quality is sufficient for research papers and documents. | `pdfjs-dist` directly (lower-level, more code) — kept available for cases needing layout-aware extraction. |
 | File parsing — DOCX | **mammoth** | Converts `.docx` to clean HTML/text while preserving heading/list structure; small, well-scoped, widely used. | `docx4js`, `textract` (less actively maintained). |
 | File parsing — PPTX | **officeparser**, with a JSZip + `fast-xml-parser` custom slide-XML walk as fallback | PPTX has no single dominant OSS parser; `officeparser` covers the common case (per-slide text) and the fallback path handles anything it misses without adding a second runtime. | Spawning `python-pptx` as a subprocess (rejected — pulls a Python runtime into an otherwise pure-Node app). |
-| AI runtime client | **`openai` npm SDK**, pointed at LM Studio's OpenAI-compatible endpoint (`baseURL`/model configurable in `settings`) | LM Studio speaks the OpenAI wire protocol, so the official client works against it unmodified with zero cloud coupling; this is the single chokepoint client used by the AI Orchestration Service ([01-system-architecture.md](01-system-architecture.md#module-boundaries)). | A bespoke `fetch` wrapper (reimplements what the SDK already does); LangChain/LlamaIndex (heavier abstraction than a single-provider chokepoint service needs — see [07-ai-pipeline.md](07-ai-pipeline.md), planned). |
-| Desktop packaging | **Electron shell** wrapping the Next.js server, producing installers (`.dmg`/`.exe`/AppImage); a plain `node` launch path remains available for power users/dev | Gives a non-technical single user a double-click app with a dock/tray icon and optional autostart, matching the README's "runs entirely on that user's own machine" framing — without requiring a terminal. | Tauri (smaller binaries, but adds a Rust toolchain to the build pipeline); shipping only a "start server, open browser tab" script (kept as the dev/power-user path, not the default distributable — see [12-deployment.md](12-deployment.md), planned). |
+| AI runtime client | **`openai` npm SDK**, pointed at LM Studio's OpenAI-compatible endpoint (`baseURL`/model configurable in `settings`) | LM Studio speaks the OpenAI wire protocol, so the official client works against it unmodified with zero cloud coupling; this is the single chokepoint client used by the AI Orchestration Service ([01-system-architecture.md](01-system-architecture.md#module-boundaries)). | A bespoke `fetch` wrapper (reimplements what the SDK already does); LangChain/LlamaIndex (heavier abstraction than a single-provider chokepoint service needs — see [07-ai-pipeline.md](07-ai-pipeline.md)). |
+| Desktop packaging | **Electron shell** wrapping the Next.js server, producing installers (`.dmg`/`.exe`/AppImage); a plain `node` launch path remains available for power users/dev | Gives a non-technical single user a double-click app with a dock/tray icon and optional autostart, matching the README's "runs entirely on that user's own machine" framing — without requiring a terminal. | Tauri (smaller binaries, but adds a Rust toolchain to the build pipeline); shipping only a "start server, open browser tab" script (kept as the dev/power-user path, not the default distributable — see [12-deployment.md](12-deployment.md)). |
 
 ## Database & search layer, in detail
 
@@ -60,7 +60,7 @@ flowchart TB
 needs concurrent async I/O in flight to the same file from a single Node process — a synchronous,
 blocking driver is *simpler* here, not a downgrade, and it's what lets services and the worker share
 one connection model without a callback/promise translation layer. `PRAGMA journal_mode = WAL` is
-set at connection time (see [11-scalability.md](11-scalability.md), planned) so the UI's read
+set at connection time (see [11-scalability.md](11-scalability.md)) so the UI's read
 queries aren't blocked by the worker's writes.
 
 `sqlite-vec` and FTS5 both live as virtual tables in the same file Drizzle otherwise manages, which
@@ -87,7 +87,7 @@ RETURNING *;
 `better-sqlite3` executes this synchronously inside SQLite's own locking, so a single-writer,
 single-worker-process design needs no additional mutex or distributed lock — the same guarantee
 BullMQ+Redis would provide, without a second service. This is revisited only if
-[11-scalability.md](11-scalability.md) (planned) identifies a real throughput ceiling; see the
+[11-scalability.md](11-scalability.md) identifies a real throughput ceiling; see the
 "when to migrate to a dedicated graph DB" pattern in
 [03-knowledge-graph-design.md](03-knowledge-graph-design.md#when-and-why-to-migrate-to-a-dedicated-graph-db)
 for the same style of trigger-condition thinking applied to storage.
@@ -108,7 +108,7 @@ Model name and base URL are read from the `settings` table
 PID at a different LM Studio instance (e.g., on another machine on the LAN) or a different
 OpenAI-compatible local server (Ollama's OpenAI-compat endpoint, llama.cpp's server mode) without a
 code change. Full prompt templates, retry/timeout policy, and RAG composition are specified in
-[07-ai-pipeline.md](07-ai-pipeline.md) (planned); this doc only fixes the client library.
+[07-ai-pipeline.md](07-ai-pipeline.md); this doc only fixes the client library.
 
 ## Desktop packaging, in detail
 
@@ -121,7 +121,7 @@ Two run modes ship from the same codebase:
 
 Both modes talk to the same on-disk SQLite file and the same LM Studio instance; Electron adds no
 new data path, only a native window shell. Full packaging, code-signing, and update-channel detail
-lives in [12-deployment.md](12-deployment.md) (planned).
+lives in [12-deployment.md](12-deployment.md).
 
 ## Supporting tooling
 
@@ -143,7 +143,7 @@ A few smaller choices round out the stack; the exhaustive list with licenses liv
   and write.
 - [03-knowledge-graph-design.md](03-knowledge-graph-design.md) — the graph model that motivates the
   Cytoscape.js and sqlite-vec choices above.
-- [07-ai-pipeline.md](07-ai-pipeline.md) (planned) — how the LM Studio client above is used for
+- [07-ai-pipeline.md](07-ai-pipeline.md) — how the LM Studio client above is used for
   prompting, RAG, and extraction.
 - [13-open-source-tools.md](13-open-source-tools.md) — the broader menu of OSS options this document
   chose from, plus licenses and maturity notes for every library named here.

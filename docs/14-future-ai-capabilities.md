@@ -37,7 +37,7 @@ consent gate before it ships.
 | 8 — High | [Inbox triage agent](#inbox-triage-agent) (act mode: archive/label/draft-reply) | Consent-gated action execution, undo log | High — first capability that mutates external state |
 | 9 — High | [Multi-agent orchestration](#multi-agent-orchestration-patterns) | Tool-use loop, sub-agent isolation, larger context budgets | High — compounds every risk below it; a bug in orchestration can chain multiple actions |
 | 10 — High | [Scheduling negotiator](#scheduling-negotiator) | Calendar write access, multi-party negotiation logic | High — acts on the user's behalf toward *other people*, not just their own data |
-| 11 — Speculative | [Local fine-tuning / LoRA](#local-fine-tuning-lora-on-personal-writing-style) | Training infra, personal-writing-sample corpus, model-versioning story | Medium risk, high engineering cost — a new local subsystem (training pipeline) with its own resource/privacy footprint |
+| 11 — Speculative | [Local fine-tuning / LoRA](#local-fine-tuning--lora-on-personal-writing-style) | Training infra, personal-writing-sample corpus, model-versioning story | Medium risk, high engineering cost — a new local subsystem (training pipeline) with its own resource/privacy footprint |
 
 ## Autonomous agents
 
@@ -66,7 +66,7 @@ logged approval triggers the tool call. "Autonomous" describes the *reasoning* l
 | Aspect | Design |
 |---|---|
 | What it does | Given the user's `Topic`/`Project` entities and recently-ingested papers, periodically checks configured external feeds (arXiv API, an RSS the user already added, Semantic Scholar if a key is provided) for new papers matching the user's existing interest graph, and surfaces candidates in Research Assistant as "you might want to ingest this" — it never auto-ingests, only recommends. |
-| Retrieval/context | The user's `Topic`/`Paper` entities and their `similar_to`/`relates_to` edges ([03-knowledge-graph-design.md](03-knowledge-graph-design.md#edge-relation-type-taxonomy)) define the interest profile; candidate papers are scored by embedding similarity to that profile. |
+| Retrieval/context | The user's `Topic`/`Paper` entities and their `similar_to`/`relates_to` edges ([03-knowledge-graph-design.md](03-knowledge-graph-design.md#edge--relation-type-taxonomy)) define the interest profile; candidate papers are scored by embedding similarity to that profile. |
 | Trigger | Scheduled (e.g. weekly), same job-queue mechanism as [insight generation](07-ai-pipeline.md#generation-jobs). |
 | Tools required | Outbound polling of external, source-appropriate APIs — a genuinely new egress pattern versus every existing connector, which only ever fetches content the user explicitly connected an *account* for. This must be added to the [egress-per-account-tap ledger](06-security-privacy-model.md#egress-and-the-privacy-inversion) as its own row (e.g. "Research scout -> arXiv API -> public paper metadata, no account, opt-in per feed"), not silently folded into an existing connector. |
 | Guardrails | Off by default; opt-in per external source, exactly like every other connector's `sources.enabled`; scout results are recommendations only (no auto-ingest) until the user acts; the topic/interest profile driving it is derived entirely from the user's own graph, never from a third-party recommendation service. |

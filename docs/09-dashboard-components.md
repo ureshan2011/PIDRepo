@@ -212,7 +212,7 @@ Copied into the repo per the locked decision in [04-technology-stack.md](04-tech
 
 | | |
 |---|---|
-| Purpose | Generic KPI tile (label, value, period-over-period delta, optional sparkline) reused across Personal Analytics, Weekly/Monthly Review, and the Overview's "Important Emails" mini-list rendering. |
+| Purpose | Generic KPI tile (label, value, period-over-period delta, optional sparkline) reused across Personal Analytics, Weekly/Monthly Reviews, and the Overview's "Important Emails" mini-list rendering. |
 | Data contract | Consumer-supplied — Personal Analytics calls `GET /api/analytics/stats`, Reviews calls `GET /api/reviews/:id` (both below); `StatTile` itself takes pre-computed values as props and issues no fetch of its own. |
 | Key props | `label`, `value`, `delta?`, `deltaDirection?: 'up' \| 'down'`, `sparkline?: number[]`, `icon?` |
 | Chart type | Optional inline sparkline (Recharts) |
@@ -441,7 +441,7 @@ the lowercase `status` columns on `sources`/`sync_state` in
 | AI Journal | `JournalEntry` | AI Journal Service | `journal_entries`, day's `items` |
 | Smart Search | `SearchBar`, `CitedAnswer` | Search Service | `items_fts`, `embeddings` |
 | AI Insights | `InsightFeed` | Insights Service | `insights`, `entities`, `edges` |
-| Weekly/Monthly Review | `ReviewReport`, `StatTile` | Review Service | `reviews`, period's `items`/`goals`/`insights` |
+| Weekly/Monthly Reviews | `ReviewReport`, `StatTile` | Review Service | `reviews`, period's `items`/`goals`/`insights` |
 | AI Assistant | `AssistantChat`, `CitedAnswer` | AI Assistant Service | Everything, via Knowledge Graph Service + Search Service |
 | Settings → Connections | `ConnectionHealthList` | (cross-cutting; not a dashboard section service) | `sources`, `sync_state` |
 

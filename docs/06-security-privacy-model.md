@@ -2,7 +2,7 @@
 
 Related: [README](../README.md) · [System architecture](01-system-architecture.md) ·
 [Database schema](02-database-schema.md) · [API integrations](05-api-integrations.md) ·
-[Outlook collector](15-outlook-collector.md) (planned)
+[Outlook collector](15-outlook-collector.md)
 
 ## Overview
 
@@ -24,7 +24,7 @@ Everything below expands one piece of that sentence.
 | Cloud exposure of personal data | A connector (or a future feature) sends ingested content to a third-party server the user didn't explicitly consent to. | No PID cloud exists at all. Every connector is opt-in per source (`sources.enabled`), egress is enumerated per account (see the [egress ledger](#egress-and-the-privacy-inversion) below), and there is no telemetry channel to exfiltrate through. |
 | Device theft / physical access | Someone gets the laptop/desktop and tries to read the SQLite file or extract cached credentials. | OS-level disk encryption is the assumed baseline (see [data-at-rest](#data-at-rest)); an optional SQLCipher-encrypted database adds a second layer independent of OS disk encryption; secrets are never stored in the database file itself, only OS-native credential stores. |
 | Over-permissioned tokens | A connector requests broader OAuth scopes than it needs, so a compromised token exposes more than the feature requires. | Every connector requests the minimum scope for its stated purpose (e.g. `Mail.Read`, not `Mail.ReadWrite`; `Contacts.Read`, not full contacts access) — see the per-source auth models in [05-api-integrations.md](05-api-integrations.md). Scopes are documented per connector so a scope creep is a visible diff, not a silent addition. |
-| Prompt injection via ingested content | A malicious or adversarially-crafted document, email, or web page the user ingests contains text engineered to hijack the AI Assistant's instructions when retrieved into a RAG prompt. | Ingested content is always treated as **data**, never as **instructions** — see [prompt-injection mitigations](#prompt-injection-mitigations) below, and the prompt-template catalog in [07-ai-pipeline.md](07-ai-pipeline.md) (planned) for how retrieval results are framed in every prompt. |
+| Prompt injection via ingested content | A malicious or adversarially-crafted document, email, or web page the user ingests contains text engineered to hijack the AI Assistant's instructions when retrieved into a RAG prompt. | Ingested content is always treated as **data**, never as **instructions** — see [prompt-injection mitigations](#prompt-injection-mitigations) below, and the prompt-template catalog in [07-ai-pipeline.md](07-ai-pipeline.md) for how retrieval results are framed in every prompt. |
 | Credential leakage via logs/exports | A refresh token or API key ends up in a log file, crash dump, or a user-initiated export/backup. | Secrets never enter application logs (structured logging redacts known secret-shaped fields); backups/exports (see [backup and export](#backup-and-export)) cover the SQLite file and user content only — never the OS credential store. |
 | Malicious or buggy connector code | A third-party or future connector reads/writes data outside its declared scope, or a compromised dependency exfiltrates data. | The `Connector` interface ([05-api-integrations.md](05-api-integrations.md)) is the *only* way ingestion code touches the system — connectors receive a scoped `ConnectorAccount`, not raw database access; the module-boundary rule in [01-system-architecture.md](01-system-architecture.md#module-boundaries) keeps connectors from depending on Services or Storage internals. |
 | Compromised or malicious local network peer | Something else on the LAN intercepts traffic between PID and LM Studio, or between PID and a cloud API. | LM Studio traffic defaults to `localhost` (no LAN exposure unless the user explicitly reconfigures it — see [LM Studio locality](#lm-studio-locality)); all cloud-API egress uses TLS to the provider's own endpoint, matching what any other native client (Outlook, a browser) would already do. |
@@ -54,7 +54,7 @@ user-supplied passphrase, so the data is protected even in scenarios where OS di
 absent, misconfigured, or the disk is mounted/read by another OS instance. This is opt-in (not the
 default) because it trades off convenience — a per-launch or per-session passphrase prompt for a
 tool designed to run unattended — against defense-in-depth; the implementation note lives in
-[04-technology-stack.md](04-technology-stack.md) (planned) alongside the `better-sqlite3` /
+[04-technology-stack.md](04-technology-stack.md) alongside the `better-sqlite3` /
 SQLCipher-build tooling decision.
 
 ## Secrets handling
@@ -111,7 +111,7 @@ Outlook's own Gmail/IMAP support works by routing the account's mail through a M
 backend — meaning a tool that ingested Gmail by reading New Outlook's local state would actually be
 laundering Google mail content through Microsoft's cloud, a strictly *worse* privacy posture than
 just talking IMAP to Google directly. PID's tap-selection design in
-[05-api-integrations.md](05-api-integrations.md#outlook-email-and-calendar--design-spec-self-configuring-collector)
+[05-api-integrations.md](05-api-integrations.md#outlook-email--calendar--design-spec-self-configuring-collector)
 and [15-outlook-collector.md](15-outlook-collector.md) exists specifically to avoid this trap: every
 non-Microsoft account is tapped at its own provider, never proxied through Outlook's cloud plumbing.
 
@@ -123,7 +123,7 @@ Slack traffic going to Slack's API and GitHub traffic going to GitHub's API in
 ### Egress-per-account-tap ledger
 
 PID maintains this ledger conceptually as a per-`sources`-row property (surfaced in Settings ->
-Connections, [09-dashboard-components.md](09-dashboard-components.md), planned, via the
+Connections, [09-dashboard-components.md](09-dashboard-components.md), via the
 `ConnectionHealthList` component) so a user can see, per configured account, exactly which endpoint
 its tap contacts and confirm no data is routed anywhere unexpected:
 
@@ -155,7 +155,7 @@ macOS, Secret Service on Linux.
 ## Prompt-injection mitigations
 
 Every dashboard section that does RAG over ingested content (Smart Search, AI Assistant, Research
-Assistant, and the generation jobs cataloged in [07-ai-pipeline.md](07-ai-pipeline.md), planned) is
+Assistant, and the generation jobs cataloged in [07-ai-pipeline.md](07-ai-pipeline.md)) is
 retrieving text PID does not control the authorship of — an email, a web page's content, a document a
 third party sent the user. That content can contain text deliberately crafted to look like an
 instruction to the model ("ignore previous instructions and ..."). PID's mitigations, layered rather
@@ -170,11 +170,11 @@ than relying on any single one:
 - **No tool-execution capability inside RAG-answering prompts.** The AI Assistant's retrieval-answer
   path has no access to any action-taking tool (no ability to send an email, modify a file, call a
   connector) — a successful injection in this path can at worst produce a misleading *answer*, not an
-  unwanted *action*. Any future agentic capability that *does* take actions (docs/14, planned) is
+  unwanted *action*. Any future agentic capability that *does* take actions (docs/14) is
   designed with a separate, explicit user-confirmation gate before execution, never triggered directly
   from unreviewed retrieved content.
 - **Citations force traceability.** Every RAG answer is required to cite the specific `items` it drew
-  from ([07-ai-pipeline.md](07-ai-pipeline.md), planned); a user can always see which ingested item
+  from ([07-ai-pipeline.md](07-ai-pipeline.md)); a user can always see which ingested item
   produced a suspicious claim and investigate or exclude that source.
 - **Source-level trust is not automatically escalated to instruction-level trust**, even for sources
   the user chose to connect — an ingested email is data with a known provenance (`items.source_id`),
@@ -216,7 +216,7 @@ shared machine from reaching it:
   the network unless the user deliberately reconfigures binding (e.g. to access the dashboard from a
   phone on the same LAN).
 - **Local session auth:** a single local passphrase (or OS-native auth, e.g. Windows Hello, where the
-  packaging layer supports it — see [12-deployment.md](12-deployment.md), planned) gates the web UI
+  packaging layer supports it — see [12-deployment.md](12-deployment.md)) gates the web UI
   session, protecting against another OS-level user account or a browser-based CSRF/DNS-rebinding
   attempt reaching the API routes. This is intentionally a single shared-secret model, not a
   multi-user account system — there is exactly one user by design ([README](../README.md)).
@@ -224,7 +224,7 @@ shared machine from reaching it:
     the expected local origin, since a malicious page in the browser could otherwise attempt
     same-origin-looking requests to `localhost`.
 - **If the user opts into LAN or remote exposure** (e.g. reverse-proxied through Tailscale to check
-  the dashboard from a phone, per [12-deployment.md](12-deployment.md), planned), the same passphrase
+  the dashboard from a phone, per [12-deployment.md](12-deployment.md)), the same passphrase
   gate applies, and the deployment doc's recommendation is a private overlay network (Tailscale/VPN)
   over any form of public exposure — consistent with this doc's no-public-endpoint stance for every
   connector tap.
@@ -233,13 +233,13 @@ shared machine from reaching it:
 
 - [05-api-integrations.md](05-api-integrations.md) — the `Connector` interface, per-source auth
   models, and the full Outlook tap-precedence spec this doc's egress ledger summarizes.
-- [15-outlook-collector.md](15-outlook-collector.md) (planned) — token storage detail, the
+- [15-outlook-collector.md](15-outlook-collector.md) — token storage detail, the
   degrade-loudly health-status UX, and the full egress-per-account-tap ledger scoped to Outlook
   accounts specifically.
 - [02-database-schema.md](02-database-schema.md) — `sources` (per-account connector registry and
   status), `sync_state` (per-tap cursor and health), and `message_identity` (cross-tap dedupe) — the
   tables this document's controls are enforced around.
-- [07-ai-pipeline.md](07-ai-pipeline.md) (planned) — prompt-template catalog referenced in the
+- [07-ai-pipeline.md](07-ai-pipeline.md) — prompt-template catalog referenced in the
   [prompt-injection mitigations](#prompt-injection-mitigations) section above.
 - [01-system-architecture.md](01-system-architecture.md) — the companion collector, LM Studio as an
   external local process, and the module-boundary rules this doc's threat model assumes hold.

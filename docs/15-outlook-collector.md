@@ -10,7 +10,7 @@ Outlook is not one integration — it is `(Outlook flavor) x (account type)`, an
 read a mailbox differs per cell of that matrix. This document is the full design of the **companion
 collector**: the small, per-user process introduced in
 [01-system-architecture.md](01-system-architecture.md#the-companion-collector) and summarized in
-[05-api-integrations.md](05-api-integrations.md#outlook-email-and-calendar--design-spec-self-configuring-collector)
+[05-api-integrations.md](05-api-integrations.md#outlook-email--calendar--design-spec-self-configuring-collector)
 that owns every part of that problem — detecting what's installed, classifying each configured
 account, picking a tap (with fallbacks), running backfill and incremental sync (possibly on
 different taps at once), de-duplicating across taps, expanding calendar recurrence uniformly, and
@@ -34,7 +34,7 @@ why this distinction matters concretely for Gmail-under-New-Outlook.
 ## 2. Architecture overview
 
 The collector runs as a single **per-user, STA (single-threaded apartment), logon-launched**
-process — never a SYSTEM service (see [§6](#6-unattended-scheduling-model) for why). It owns its
+process — never a SYSTEM service (see [§6](#6-unattendedscheduling-model) for why). It owns its
 own local SQLite staging database (WAL mode), separate from the main PID database. The main app's
 `outlook-collector` shim connector ([05-api-integrations.md](05-api-integrations.md#the-connector-interface))
 opens that staging database read-only and treats new/changed staging rows exactly like any other
@@ -720,7 +720,7 @@ discussion: [06-security-privacy-model.md](06-security-privacy-model.md#egress-a
   Manager.
 - [02-database-schema.md](02-database-schema.md#app-tables) — canonical DDL for `sync_state`,
   `message_identity`, and `item_external_ids`, reproduced in §5.3 for self-containedness.
-- [05-api-integrations.md](05-api-integrations.md#outlook-email-and-calendar--design-spec-self-configuring-collector) —
+- [05-api-integrations.md](05-api-integrations.md#outlook-email--calendar--design-spec-self-configuring-collector) —
   the `Connector`/`NormalizedItem`/`ConnectorError` contracts the `outlook-collector` shim connector
   implements, and the summarized tap-precedence rules this document expands in full.
 - [06-security-privacy-model.md](06-security-privacy-model.md#egress-and-the-privacy-inversion) —

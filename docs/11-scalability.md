@@ -164,7 +164,7 @@ something to wait on a trigger for.
 
 **Trigger**: one specific subsystem's I/O or size dominates the file — e.g., photo-metadata churn
 from a nightly re-walk visibly affects unrelated query latency, or the whole-file backup described
-in [12-deployment.md](12-deployment.md#backup-strategy) has grown large enough that daily backups
+in [12-deployment.md](12-deployment.md#backup-strategy-for-the-sqlite-file) has grown large enough that daily backups
 are inconvenient — but overall volume is still well within SQLite's ceiling.
 
 - Move a hot or cold subsystem to its own `.sqlite` file, `ATTACH DATABASE`-ed at connection time —
@@ -193,7 +193,7 @@ provides and `sqlite-vec` at PID's pinned version does not) becomes necessary ra
   `vec0`'s brute-force KNN syntax → `pgvector`'s `<->`/`<=>` operators and index definitions, and
   moving `better-sqlite3`'s synchronous connection model to an async pool.
 - Still entirely self-hosted and local (or on a self-hosted server the user controls, per
-  [12-deployment.md](12-deployment.md#optional-cloud-self-hosted-deployment)) — this migration does
+  [12-deployment.md](12-deployment.md#optional-cloudself-hosted-deployment)) — this migration does
   not by itself change PID's privacy posture, only its infrastructure footprint.
 
 ### 4. Dedicated graph and/or vector stores

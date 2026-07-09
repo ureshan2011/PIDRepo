@@ -62,7 +62,7 @@ one embedding model, and routes each job to the cheapest class that can do it re
 
 | Class | Example models | Used for | Why |
 |---|---|---|---|
-| **Small instruct** (`ai.classifierModel`, ~3B–8B) | Qwen2.5-3B/7B-Instruct, Llama-3.2-3B-Instruct, Phi-3.5-mini | Classification, tagging, entity/relation extraction ([03-knowledge-graph-design.md](03-knowledge-graph-design.md#2-llm-entity-relation-extraction-lm-studio)), thumbs-up/down-driven re-prompts, query intent classification for Smart Search | Runs fast on modest hardware, keeps the always-on extraction pipeline cheap; these jobs are high-volume (every ingested item) and low-reasoning-depth. |
+| **Small instruct** (`ai.classifierModel`, ~3B–8B) | Qwen2.5-3B/7B-Instruct, Llama-3.2-3B-Instruct, Phi-3.5-mini | Classification, tagging, entity/relation extraction ([03-knowledge-graph-design.md](03-knowledge-graph-design.md#2-llm-entityrelation-extraction-lm-studio)), thumbs-up/down-driven re-prompts, query intent classification for Smart Search | Runs fast on modest hardware, keeps the always-on extraction pipeline cheap; these jobs are high-volume (every ingested item) and low-reasoning-depth. |
 | **Larger instruct** (`ai.chatModel`, ~13B–34B, or whatever the user's hardware fits) | Qwen2.5-14B/32B-Instruct, Llama-3.1-8B/70B-Instruct, Mistral-Small | Daily briefing, AI journal reflections, weekly/monthly reviews, paper summarization/lit review, decision support, insights synthesis, the AI Assistant's grounded answers | Lower-volume, higher-reasoning jobs where coherent long-form synthesis and following a JSON schema under more complex instructions matters more than latency. |
 | **Embedding model** (`ai.embeddingModel`, 768-dim default) | nomic-embed-text-v1.5, bge-base-en-v1.5 | Chunk embeddings, entity descriptive embeddings, query embeddings for hybrid retrieval | Must match the dimension pinned in `embeddings`/`entity_embeddings` (`vec0(embedding FLOAT[768])`, [02-database-schema.md](02-database-schema.md#core-tables)); changing models triggers the `maintenance_reembed` job ([01-system-architecture.md](01-system-architecture.md#background-worker)). |
 
@@ -184,7 +184,7 @@ flowchart LR
    re-embedded (`maintenance_reembed`, [01-system-architecture.md](01-system-architecture.md#background-worker)).
 5. **Extract.** `pipeline_extract` runs the deterministic pass (structured fields, no model call)
    and, for free-text bodies, the LLM extraction pass against `ai.classifierModel` — full contract
-   in [03-knowledge-graph-design.md](03-knowledge-graph-design.md#2-llm-entity-relation-extraction-lm-studio).
+   in [03-knowledge-graph-design.md](03-knowledge-graph-design.md#2-llm-entityrelation-extraction-lm-studio).
    Long bodies are extracted per-chunk (reusing the chunks from step 3) rather than truncated, and
    the per-chunk entity/relation lists are merged before writing.
 6. **Link.** Extraction output is written to `entities`/`edges` through the Knowledge Graph Service,
@@ -279,7 +279,7 @@ date range. Both legs run scoped to papers: the FTS5 leg catches papers whose ti
 literally contains "cybersickness," the vector leg catches papers that discuss the concept without
 using that exact term (a paper about "simulator sickness in VR HMDs," say). The graph is also
 consulted opportunistically: if a `Topic` entity named "cybersickness" already exists (from prior
-LLM extraction, [03-knowledge-graph-design.md](03-knowledge-graph-design.md#2-llm-entity-relation-extraction-lm-studio)),
+LLM extraction, [03-knowledge-graph-design.md](03-knowledge-graph-design.md#2-llm-entityrelation-extraction-lm-studio)),
 its `mentions`/`relates_to` edges supply additional candidate papers via the
 [semantic + graph combined](03-knowledge-graph-design.md#graph-query-patterns-in-the-app-layer)
 pattern, merged into the same ranked candidate set before the grounded-answer step.
@@ -343,7 +343,7 @@ trigger (e.g. "this period's items") rather than running a search.
 | **Insights / anomaly detection** | Recent graph activity (new entities/edges, mention-count deltas), recent domain-table trends (spend, health metrics) | Structured scan (no per-insight retrieval; the scan itself *is* the retrieval, over a recent window) | `{ kind: pattern\|anomaly\|connection\|suggestion, title, body, confidence, relatedEntityIds: string[], relatedItemIds: string[] }[]` | Scheduled (nightly) | Larger instruct (batch, multiple insights per run) |
 | **AI Memory extraction** | A conversation transcript or journal entry | None (input is the source item itself) | `{ facts: [{ type: Preference\|Fact, statement, confidence }] }` | On-demand (after conversation/journal save), also re-run in a periodic sweep over `ai_conversation_messages` for anything missed live | Small instruct |
 | **Smart Search / AI Assistant answer** | User query, retrieved context, AI Memory recall block | Full hybrid RAG pipeline, see [RAG smart search](#rag-smart-search) | `{ answer, citations: [{ itemId, snippet }] }` | On-demand (every query/turn) | Larger instruct (query understanding sub-step uses the small model) |
-| **Entity/relation extraction** | Item title/body (chunked), known-entity name list for the item's domain | None (extraction target *is* the item) | See the full contract in [03-knowledge-graph-design.md](03-knowledge-graph-design.md#2-llm-entity-relation-extraction-lm-studio) | Background (`pipeline_extract`, after every new/changed item) | Small instruct |
+| **Entity/relation extraction** | Item title/body (chunked), known-entity name list for the item's domain | None (extraction target *is* the item) | See the full contract in [03-knowledge-graph-design.md](03-knowledge-graph-design.md#2-llm-entityrelation-extraction-lm-studio) | Background (`pipeline_extract`, after every new/changed item) | Small instruct |
 
 ### Feedback loop
 

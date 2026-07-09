@@ -2,7 +2,7 @@
 
 Related: [README](../README.md) · [System architecture](01-system-architecture.md) ·
 [Database schema](02-database-schema.md) · [Security & privacy model](06-security-privacy-model.md) ·
-[Outlook collector](15-outlook-collector.md) (planned)
+[Outlook collector](15-outlook-collector.md)
 
 ## Overview
 
@@ -21,7 +21,7 @@ This doc covers, in order:
 3. Per-source integration design for every non-Outlook source in the feature set.
 4. Outlook email + calendar, which gets its own spec block because — unlike every other source — it
    is not one integration but a per-account tap-selection problem, owned by a dedicated companion
-   process ([15-outlook-collector.md](15-outlook-collector.md), planned).
+   process ([15-outlook-collector.md](15-outlook-collector.md)).
 5. A summary table of every source's mechanism, auth, direction, and cadence.
 
 One row in `sources` ([02-database-schema.md](02-database-schema.md#core-tables)) is one
@@ -288,7 +288,7 @@ whole point of the interface (see the [README](../README.md#locked-decisions-can
 |---|---|
 | Auth | None — Open-Meteo's free tier requires no API key. |
 | Mechanism | Simple REST GET against the Open-Meteo forecast endpoint, parameterized by the user's configured lat/lon (entered manually or resolved once via geocoding, then cached — no continuous location tracking). |
-| Data pulled | Current conditions + short-range forecast, surfaced by the Executive Overview's `WeatherTile` (docs/09, planned) — not stored as `items` rows (it's ephemeral display data, not durable knowledge-graph content), so it has no `sources`/`sync_state` row. |
+| Data pulled | Current conditions + short-range forecast, surfaced by the Executive Overview's `WeatherTile` (docs/09) — not stored as `items` rows (it's ephemeral display data, not durable knowledge-graph content), so it has no `sources`/`sync_state` row. |
 | Cadence | Hourly refresh, cached in-memory/short-TTL. |
 | Privacy notes | Only a static lat/lon leaves the device, to a weather API with no PID account attached. |
 
@@ -494,7 +494,7 @@ Per-account tap precedence (full algorithm in docs/15):
   `item_external_ids`, and `message_identity`, all referenced throughout this doc.
 - [06-security-privacy-model.md](06-security-privacy-model.md) — the threat model, secrets handling,
   and the egress-per-account-tap ledger that governs every auth strategy and tap named above.
-- [15-outlook-collector.md](15-outlook-collector.md) (planned) — full design of the companion process
+- [15-outlook-collector.md](15-outlook-collector.md) — full design of the companion process
   this doc's Outlook section only summarizes: the account-classification algorithm, backfill/delta
   merge, identity/watermark handling, and degrade-loudly UX.
 - [01-system-architecture.md](01-system-architecture.md) — where the Connector Manager, pipeline, and
