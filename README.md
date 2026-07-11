@@ -10,8 +10,15 @@ single, searchable **knowledge graph**. On top of that graph it surfaces twelve 
 that answer the two questions a second brain exists for: *what's going on*, and *what should I do
 about it*.
 
-> **Status**: design-documentation phase. This repository currently contains architecture and
-> design docs only — no application code. See [Document map](#document-map) below.
+> **Status**: Phase 0 (Scaffold) + Phase 1 (MVP) implemented. The Next.js application now lives at
+> the repository root alongside the design docs: a migrated SQLite database, the seed connector and
+> background worker, Tasks/Notes/Goals CRUD, the Executive Overview with an AI daily briefing, and the
+> single-passphrase local auth gate — all per the
+> [implementation roadmap](docs/10-implementation-roadmap.md). Run it with
+> `pnpm install && pnpm db:migrate && pnpm db:seed && pnpm dev` (dev passphrase `pid-dev`), and start
+> the worker with `pnpm worker`. The AI daily briefing requires a local
+> [LM Studio](https://lmstudio.ai) server; without it the app degrades loudly (raw-highlights
+> fallback). See [Document map](#document-map) below for the design set.
 
 ---
 
