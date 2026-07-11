@@ -21,13 +21,18 @@ export type JobHandler = (
 // ---------------------------------------------------------------------------
 // PHASE 1 EXTENSION POINT — register job handlers here.
 //
-// Phase 1 registers: connector_sync, pipeline_chunk, pipeline_embed, e.g.:
-//   import { connectorSync } from "./handlers/connector-sync";
-//   registerHandler("connector_sync", connectorSync);
+// Phase 1 registers: connector_sync, pipeline_chunk, pipeline_embed.
 // Add later job types (pipeline_extract, insight_generation, ...) in their phases.
-// Leave EMPTY in Phase 0.
 // ---------------------------------------------------------------------------
-export const handlers: Record<string, JobHandler> = {};
+import { connectorSync } from "./handlers/connector-sync";
+import { pipelineChunk } from "./handlers/pipeline-chunk";
+import { pipelineEmbed } from "./handlers/pipeline-embed";
+
+export const handlers: Record<string, JobHandler> = {
+  connector_sync: connectorSync,
+  pipeline_chunk: pipelineChunk,
+  pipeline_embed: pipelineEmbed,
+};
 
 /** Register (or override) a handler for a job type. */
 export function registerHandler(type: string, handler: JobHandler): void {

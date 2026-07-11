@@ -18,3 +18,6 @@ pid.sqlite-*
 *.pem
 npm-debug.log*
 next-env.d.ts
+
+# TS incremental build cache
+*.tsbuildinfo
