@@ -1,5 +1,6 @@
 import type { Connector } from "./types";
 import { sampleConnector } from "./sample";
+import { outlookCollectorConnector } from "./outlook/shim";
 
 /**
  * Connector registry — maps `connector_id` (== `sources.connector_id`) to its
@@ -10,6 +11,7 @@ import { sampleConnector } from "./sample";
 
 const registry: Record<string, Connector> = {
   [sampleConnector.id]: sampleConnector,
+  [outlookCollectorConnector.id]: outlookCollectorConnector,
 };
 
 /** Look up a connector by id; `undefined` if none registered. */

@@ -54,6 +54,15 @@ export interface NormalizedItem {
   type: string; // items.type
   externalId: string; // items.external_id
   tap: Tap; // -> item_external_ids.tap
+  /**
+   * Cross-tap canonical identity (docs/15 §5.2): RFC 5322 Message-ID / iCalendar
+   * UID, or a normalized content-hash fallback. When set, ingest collapses the
+   * same physical message seen via two different taps into ONE `items` row
+   * (docs/15 §4.2). Optional + backwards compatible — connectors that don't emit
+   * a cross-tap identity (e.g. the sample connector) simply omit it and keep the
+   * plain (source_id, external_id) upsert path.
+   */
+  canonicalKey?: string;
   title?: string;
   body?: string;
   bodyFormat?: "text" | "markdown" | "html";

@@ -14,6 +14,7 @@
     "db:migrate": "tsx src/db/migrate.ts",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx src/db/seed.ts",
+    "db:seed:outlook": "tsx src/db/dev/seed-outlook-demo.ts",
     "worker": "tsx src/worker/index.ts",
     "worker:dev": "tsx watch src/worker/index.ts",
     "test": "vitest run",

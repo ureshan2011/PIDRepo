@@ -24,3 +24,8 @@ next-env.d.ts
 
 # TS incremental build cache
 *.tsbuildinfo
+
+# Local SQLite databases (main, temp, and collector staging)
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
