@@ -10,6 +10,9 @@ dist
 pid.sqlite
 pid.sqlite-*
 
+# uploaded documents (Phase 2 ingestion)
+uploads
+
 # env
 .env.local
 

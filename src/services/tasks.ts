@@ -19,12 +19,23 @@ import { items, sources, tasks } from "@/db/schema";
 const APP_CONNECTOR_ID = "app";
 const APP_ACCOUNT_ID = "manual";
 
-/** Lazily ensure the single app-owned `sources` row exists; returns its id. */
-export function ensureAppSource(): string {
+/** Human display name for each app-owned account id (defaults to "PID (<account>)"). */
+const APP_SOURCE_LABELS: Record<string, string> = {
+  manual: "PID (manual)",
+  documents: "PID (documents)",
+};
+
+/**
+ * Lazily ensure an app-owned `sources` row exists for the given account and return
+ * its id. The default `"manual"` account backs hand-created tasks/notes; other
+ * accounts (e.g. `"documents"`) give app features that own items their own source
+ * without touching a connector. Idempotent on the (connector_id, account_id) index.
+ */
+export function ensureAppSource(accountId: string = APP_ACCOUNT_ID): string {
   const existing = db
     .select({ id: sources.id })
     .from(sources)
-    .where(and(eq(sources.connectorId, APP_CONNECTOR_ID), eq(sources.accountId, APP_ACCOUNT_ID)))
+    .where(and(eq(sources.connectorId, APP_CONNECTOR_ID), eq(sources.accountId, accountId)))
     .get();
   if (existing) return existing.id;
 
@@ -34,8 +45,8 @@ export function ensureAppSource(): string {
     .values({
       id,
       connectorId: APP_CONNECTOR_ID,
-      accountId: APP_ACCOUNT_ID,
-      displayName: "PID (manual)",
+      accountId,
+      displayName: APP_SOURCE_LABELS[accountId] ?? `PID (${accountId})`,
       category: "app",
       enabled: true,
       status: "ok",
@@ -49,7 +60,7 @@ export function ensureAppSource(): string {
   const row = db
     .select({ id: sources.id })
     .from(sources)
-    .where(and(eq(sources.connectorId, APP_CONNECTOR_ID), eq(sources.accountId, APP_ACCOUNT_ID)))
+    .where(and(eq(sources.connectorId, APP_CONNECTOR_ID), eq(sources.accountId, accountId)))
     .get();
   return row?.id ?? id;
 }

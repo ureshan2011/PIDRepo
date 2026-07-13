@@ -27,9 +27,11 @@ export type JobHandler = (
 import { connectorSync } from "./handlers/connector-sync";
 import { pipelineChunk } from "./handlers/pipeline-chunk";
 import { pipelineEmbed } from "./handlers/pipeline-embed";
+import { pipelineParse } from "./handlers/pipeline-parse";
 
 export const handlers: Record<string, JobHandler> = {
   connector_sync: connectorSync,
+  pipeline_parse: pipelineParse,
   pipeline_chunk: pipelineChunk,
   pipeline_embed: pipelineEmbed,
 };
