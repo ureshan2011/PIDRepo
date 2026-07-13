@@ -10,15 +10,13 @@ single, searchable **knowledge graph**. On top of that graph it surfaces twelve 
 that answer the two questions a second brain exists for: *what's going on*, and *what should I do
 about it*.
 
-> **Status**: Phase 0 (Scaffold) + Phase 1 (MVP) implemented. The Next.js application now lives at
-> the repository root alongside the design docs: a migrated SQLite database, the seed connector and
-> background worker, Tasks/Notes/Goals CRUD, the Executive Overview with an AI daily briefing, and the
-> single-passphrase local auth gate — all per the
-> [implementation roadmap](docs/10-implementation-roadmap.md). Run it with
-> `pnpm install && pnpm db:migrate && pnpm db:seed && pnpm dev` (dev passphrase `pid-dev`), and start
-> the worker with `pnpm worker`. The AI daily briefing requires a local
-> [LM Studio](https://lmstudio.ai) server; without it the app degrades loudly (raw-highlights
-> fallback). See [Document map](#document-map) below for the design set.
+> **Status**: Phase 0 (Scaffold), Phase 1 (MVP), and the first slice of Phase 2 (file import +
+> document parsing, plus the Outlook Collector — both the main-app shim connector and the standalone
+> Windows companion process) are implemented. The Next.js application lives at the repository root
+> alongside the design docs. **[docs/QUICKSTART.md](docs/QUICKSTART.md) has a 5-command setup +
+> feature-by-feature verification checklist** — start there. See
+> [Document map](#document-map) below for the full design set and
+> [implementation roadmap](docs/10-implementation-roadmap.md) for what's next.
 
 ---
 
