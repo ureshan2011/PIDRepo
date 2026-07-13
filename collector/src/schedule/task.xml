@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<!--
+  PID Outlook Collector — Scheduled Task template (docs/15 §6.1, docs/12).
+  Placeholders substituted by schedule/install.ts:
+    {{USER_ID}}   e.g. DOMAIN\user or COMPUTER\user  (the specific user SID/name)
+    {{COMMAND}}   absolute path to node.exe
+    {{ARGUMENTS}} absolute path to dist/index.js
+    {{WORKDIR}}   the collector install directory
+    {{DATE}}      registration timestamp (ISO 8601)
+
+  Locked settings (docs/15 §6.1 / docs/12 install table):
+    - LogonTrigger for the SPECIFIC user (NOT a system-startup / boot trigger).
+    - RunLevel = LeastPrivilege  (NO "Run with highest privileges": Redemption needs
+      no admin; elevation would UAC-prompt every logon and break "unattended").
+    - InteractiveToken logon (NOT "run whether logged on or not" = S4U/batch, which has
+      no interactive desktop and breaks COM/MAPI — docs/15 §6.3).
+    - RestartOnFailure: 3 attempts at 1-minute intervals (then the app's own daily retry).
+-->
+<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Date>{{DATE}}</Date>
+    <Author>PID</Author>
+    <Description>PID Outlook Collector — per-user, logon-launched mail/calendar collector.</Description>
+    <URI>\PID\OutlookCollector</URI>
+  </RegistrationInfo>
+  <Triggers>
+    <LogonTrigger>
+      <Enabled>true</Enabled>
+      <UserId>{{USER_ID}}</UserId>
+    </LogonTrigger>
+  </Triggers>
+  <Principals>
+    <Principal id="Author">
+      <UserId>{{USER_ID}}</UserId>
+      <LogonType>InteractiveToken</LogonType>
+      <RunLevel>LeastPrivilege</RunLevel>
+    </Principal>
+  </Principals>
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <AllowHardTerminate>true</AllowHardTerminate>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>
+    <AllowStartOnDemand>true</AllowStartOnDemand>
+    <Enabled>true</Enabled>
+    <Hidden>false</Hidden>
+    <RunOnlyIfIdle>false</RunOnlyIfIdle>
+    <WakeToRun>false</WakeToRun>
+    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>
+    <Priority>7</Priority>
+    <RestartOnFailure>
+      <Interval>PT1M</Interval>
+      <Count>3</Count>
+    </RestartOnFailure>
+  </Settings>
+  <Actions Context="Author">
+    <Exec>
+      <Command>{{COMMAND}}</Command>
+      <Arguments>{{ARGUMENTS}}</Arguments>
+      <WorkingDirectory>{{WORKDIR}}</WorkingDirectory>
+    </Exec>
+  </Actions>
+</Task>

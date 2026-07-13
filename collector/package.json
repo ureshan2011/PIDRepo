@@ -1,0 +1,40 @@
+{
+  "name": "pid-outlook-collector",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PID Outlook Collector — the per-user, logon-launched Windows companion process (docs/15). Detects Outlook flavors, classifies accounts, selects a tap, runs backfill + incremental sync, dedupes across taps, and writes a WAL SQLite staging DB the main app's outlook-collector shim reads read-only. Windows-only at runtime.",
+  "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "pid-outlook-collector": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node -e \"require('fs').copyFileSync('src/schedule/task.xml','dist/schedule/task.xml')\"",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "setup": "tsx src/index.ts --setup",
+    "install-task": "tsx src/schedule/install.ts install",
+    "uninstall-task": "tsx src/schedule/install.ts uninstall"
+  },
+  "dependencies": {
+    "better-sqlite3": "11.5.0",
+    "imapflow": "1.4.7",
+    "tsdav": "2.3.1",
+    "ulid": "2.3.0",
+    "zod": "3.23.8"
+  },
+  "optionalDependencies": {
+    "winax": "3.6.9",
+    "win-dpapi": "1.1.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "7.6.12",
+    "@types/node": "22.10.2",
+    "tsx": "4.19.2",
+    "typescript": "5.6.3"
+  }
+}
