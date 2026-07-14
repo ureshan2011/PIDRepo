@@ -99,7 +99,11 @@ export const pipelineEmbed: JobHandler = async (payload) => {
     for (let i = 0; i < chunks.length; i++) {
       const vec = vectors[i];
       if (!vec) continue;
-      insertEmbedding.run(chunks[i].id, JSON.stringify(vec));
+      // sqlite-vec's vec0 rowid column requires a strictly INTEGER-typed bind;
+      // better-sqlite3 binds a plain JS `number` as SQLITE_FLOAT, which vec0
+      // rejects ("Only integers are allowed for primary key values"). BigInt
+      // forces an integer bind.
+      insertEmbedding.run(BigInt(chunks[i].id), JSON.stringify(vec));
       insertMeta.run(chunks[i].id, model, vec.length, now);
     }
   });
